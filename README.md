@@ -13,6 +13,9 @@ These tools vary in scope and scale, and can be utilized independently or collec
 
 ## Features
 
+- [x] Components for defining `Card`s, `Deck`s, and `Hand`s
+- [x] `CardSource` trait, to support drawing from sources other than a `Deck`
+
 - [ ] Bundles to easily create card entities
 - [ ] Resources for tracking card data, including interfaces for interacting with these resources
 - [ ] Systems for animating and interacting with card entities

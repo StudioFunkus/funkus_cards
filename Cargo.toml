@@ -1,0 +1,14 @@
+[package]
+name = "funkus_cards"
+authors = ["Studio Funkus"]
+version = "0.1.0"
+edition = "2024"
+description = "A collection of utilities for card-based systems in the Bevy game engine"
+license = "Apache-2.0"
+repository = "https://github.com/StudioFunkus/funkus_cards"
+homepage = "https://github.com/StudioFunkus/funkus_cards"
+publish = false
+
+[dependencies]
+bevy = { version = "0.16.1", features = ["wayland"] }
+rand = "0.9.1"
