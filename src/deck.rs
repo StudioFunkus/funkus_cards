@@ -1,37 +1,55 @@
+use crate::*;
+
 use std::collections::VecDeque;
+use std::fmt::Debug;
 
-use bevy::prelude::*;
+pub trait CardSource<T>
+where
+    T: Send + Sync + Clone + Debug + CardData + 'static,
+{
+    fn get_card_count(&self) -> usize;
+    fn draw_one(&mut self) -> Option<T>;
+    fn draw_n(&mut self, n: usize) -> VecDeque<T>;
 
-use crate::card::Card;
-
-pub(super) fn plugin(app: &mut App) {
-    info!("Adding deck plugin");
-
-    app.register_type::<Deck>();
+    fn add_card(&mut self, card: T);
+    fn add_cards(&mut self, cards: Vec<T>);
 }
 
-#[allow(dead_code)]
-pub trait CardSource {
-    fn draw_one(&mut self) -> Option<Card>;
-    fn draw_n(&mut self, n: usize) -> VecDeque<Card>;
-}
-
-#[derive(Component, Reflect, Debug, Default)]
+#[derive(Component, Reflect, Debug, Default, Clone)]
 #[reflect(Component)]
-pub struct Deck {
-    cards: VecDeque<Card>,
+#[require(Name)]
+pub struct Deck<T>
+where
+    T: Send + Sync + Clone + Debug + CardData + 'static,
+{
+    cards: VecDeque<T>,
 }
 
-impl CardSource for Deck {
-    fn draw_one(&mut self) -> Option<Card> {
+impl<T> CardSource<T> for Deck<T>
+where
+    T: Send + Sync + Clone + Debug + CardData + 'static,
+{
+    fn draw_one(&mut self) -> Option<T> {
         self.cards.pop_front()
     }
 
-    fn draw_n(&mut self, n: usize) -> VecDeque<Card> {
+    fn draw_n(&mut self, n: usize) -> VecDeque<T> {
         if self.cards.len() >= n {
             self.cards.drain(..n).collect()
         } else {
             self.cards.drain(..).collect()
         }
+    }
+
+    fn add_card(&mut self, card: T) {
+        self.cards.push_back(card);
+    }
+
+    fn add_cards(&mut self, cards: Vec<T>) {
+        self.cards.extend(cards);
+    }
+
+    fn get_card_count(&self) -> usize {
+        self.cards.len()
     }
 }
