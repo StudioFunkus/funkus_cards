@@ -62,7 +62,7 @@ pub trait CardData {
 #[require(Name, Transform, Pickable {is_hoverable: true, should_block_lower: true})]
 pub struct Card<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData,
 {
     pub origin: Transform,
     pub data: T,

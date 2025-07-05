@@ -5,7 +5,7 @@ use std::fmt::Debug;
 
 pub trait CardSource<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData,
 {
     fn get_card_count(&self) -> usize;
     fn draw_one(&mut self) -> Option<T>;
@@ -20,14 +20,14 @@ where
 #[require(Name)]
 pub struct Deck<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData,
 {
     cards: VecDeque<T>,
 }
 
 impl<T> CardSource<T> for Deck<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData,
 {
     fn draw_one(&mut self) -> Option<T> {
         self.cards.pop_front()

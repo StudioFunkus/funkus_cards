@@ -17,7 +17,7 @@ fn main() -> AppExit {
     // Spawn and populate hand and deck
     app.add_systems(
         Startup,
-        (spawn_hand_and_deck, ApplyDeferred, populate_deck).chain(),
+        (spawn_required_entities, ApplyDeferred, populate_deck).chain(),
     );
 
     app.add_systems(Update, draw_cards.run_if(run_once));
@@ -25,7 +25,7 @@ fn main() -> AppExit {
     app.run()
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Reflect, Clone, Debug, Default)]
 struct SimpleCard {
     value: u8,
 }
@@ -37,7 +37,7 @@ impl CardData for SimpleCard {
 }
 
 #[tracing::instrument(skip_all)]
-fn spawn_hand_and_deck(mut commands: Commands, window_query: Query<&Window>) {
+fn spawn_required_entities(mut commands: Commands, window_query: Query<&Window>) {
     info!("Started");
 
     // Window, for positioning hand

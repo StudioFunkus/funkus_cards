@@ -5,12 +5,17 @@ use bevy_tweening::{
     lens::{TransformPositionLens, TransformScaleLens},
 };
 
-use std::{fmt::Debug, time::Duration};
+use std::time::Duration;
 
 pub(super) fn plugin<T>(app: &mut App)
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Clone + Send + Sync + CardData + 'static,
 {
+    app.add_event::<UpdateCardOrigins>()
+        .add_event::<CardHover>()
+        .add_event::<CardOut>()
+        .add_event::<DrawToHand>();
+
     app.add_observer(update_card_origins::<T>)
         .add_observer(draw_to_hand::<T>)
         .add_observer(card_hover::<T>)
@@ -38,7 +43,7 @@ pub fn card_hover<T>(
     mut cards_query: Query<&mut Card<T>, With<Transform>>,
     plugin_settings: Res<CardsPluginSettings>,
 ) where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Send + Sync + CardData + 'static,
 {
     if let Ok(card) = cards_query.get_mut(trigger.target()) {
         let scale_tween = Tween::new(
@@ -75,7 +80,7 @@ pub fn card_out<T>(
     mut cards_query: Query<&mut Card<T>, With<Transform>>,
     plugin_settings: Res<CardsPluginSettings>,
 ) where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Send + Sync + CardData + 'static,
 {
     if let Ok(card) = cards_query.get_mut(trigger.target()) {
         let scale_tween = Tween::new(
@@ -99,7 +104,7 @@ pub fn spawn_cards<T>(
     card_size: Vec2,
 ) -> Vec<(Entity, T)>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Send + Sync + Clone + CardData + 'static,
 {
     let mut spawned_cards: Vec<(Entity, T)> = Vec::new();
 
@@ -133,7 +138,7 @@ pub fn draw_to_hand<T>(
     mut hands_query: Query<&mut Hand<T>>,
     mut decks_query: Query<&mut Deck<T>>,
 ) where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Clone + Send + Sync + CardData + 'static,
 {
     let mut hand = hands_query.get_mut(trigger.hand_entity).unwrap();
     let mut deck = decks_query.get_mut(hand.source).unwrap();
@@ -179,7 +184,7 @@ pub fn update_card_origins<T>(
     mut card_query: Query<(Entity, &mut Card<T>, &Transform)>,
     plugin_settings: Res<CardsPluginSettings>,
 ) where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: Clone + Send + Sync + CardData + 'static,
 {
     info!("Update card origins for: {:?}", trigger.0);
     let mut hand = hand_query.get_mut(trigger.0).unwrap();

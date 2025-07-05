@@ -7,7 +7,7 @@ use std::{collections::VecDeque, fmt::Debug};
 #[require(Name, Transform, Visibility::Visible)]
 pub struct Hand<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData,
 {
     pub cards: VecDeque<(Entity, T)>,
     pub card_limit: usize,
@@ -18,7 +18,7 @@ where
 
 impl<T> Hand<T>
 where
-    T: Send + Sync + Clone + Debug + CardData + 'static,
+    T: CardData + Clone,
 {
     pub fn new(card_limit: usize, source: Entity, card_size: Vec2, card_spacing: f32) -> Hand<T> {
         Hand {
