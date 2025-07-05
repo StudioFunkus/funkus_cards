@@ -1,5 +1,5 @@
 //! A simple example demonstrating how cards can be added to a scene
-use funkus_cards::prelude::*;
+use funkus_cards::{CardsPluginSettings, prelude::*};
 
 use bevy::prelude::*;
 
@@ -8,7 +8,11 @@ const CARD_SIZE: Vec2 = Vec2 { x: 140.0, y: 190.0 };
 fn main() -> AppExit {
     let mut app = App::new();
 
+    // Plugins
     app.add_plugins((DefaultPlugins, CardsPlugin::<SimpleCard>::default()));
+
+    // Settings resource for the card plugin
+    app.insert_resource(CardsPluginSettings::default());
 
     // Spawn and populate hand and deck
     app.add_systems(
@@ -68,7 +72,7 @@ fn populate_deck(mut deck_query: Query<&mut Deck<SimpleCard>>) {
 }
 
 #[tracing::instrument(skip_all)]
-fn draw_cards(mut commands: Commands, hand_query: Query<Entity, With<Deck<SimpleCard>>>) {
+fn draw_cards(mut commands: Commands, hand_query: Query<Entity, With<Hand<SimpleCard>>>) {
     info!("Starting");
 
     let hand_entity = hand_query.single().unwrap();

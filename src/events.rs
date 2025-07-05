@@ -20,9 +20,6 @@ where
 }
 
 #[derive(Event)]
-pub struct UpdateCardOrigins(pub Entity);
-
-#[derive(Event)]
 pub struct CardHover {
     pub entity: Entity,
 }
@@ -33,25 +30,6 @@ impl From<Pointer<Over>> for CardHover {
             entity: event.target,
         }
     }
-}
-
-#[derive(Event)]
-pub struct CardOut {
-    pub entity: Entity,
-}
-
-impl From<Pointer<Out>> for CardOut {
-    fn from(event: Pointer<Out>) -> Self {
-        CardOut {
-            entity: event.target,
-        }
-    }
-}
-
-#[derive(Event)]
-pub struct DrawToHand {
-    pub hand_entity: Entity,
-    pub number_to_draw: usize,
 }
 
 pub fn card_hover<T>(
@@ -75,6 +53,19 @@ pub fn card_hover<T>(
         commands
             .entity(trigger.target())
             .with_child(Animator::new(scale_tween).with_target(trigger.target()));
+    }
+}
+
+#[derive(Event)]
+pub struct CardOut {
+    pub entity: Entity,
+}
+
+impl From<Pointer<Out>> for CardOut {
+    fn from(event: Pointer<Out>) -> Self {
+        CardOut {
+            entity: event.target,
+        }
     }
 }
 
@@ -130,18 +121,20 @@ where
     spawned_cards
 }
 
+#[derive(Event)]
+pub struct DrawToHand {
+    pub hand_entity: Entity,
+    pub number_to_draw: usize,
+}
+
 pub fn draw_to_hand<T>(
     trigger: Trigger<DrawToHand>,
     mut commands: Commands,
     mut hands_query: Query<&mut Hand<T>>,
     mut decks_query: Query<&mut Deck<T>>,
 ) where
-    T: Send + Sync + Clone + Debug + CardData,
+    T: Send + Sync + Clone + Debug + CardData + 'static,
 {
-    for hand in hands_query.iter() {
-        info!("{:?}", hand.source);
-    }
-
     let mut hand = hands_query.get_mut(trigger.hand_entity).unwrap();
     let mut deck = decks_query.get_mut(hand.source).unwrap();
     let mut number_to_draw = trigger.number_to_draw.clone();
@@ -175,6 +168,9 @@ pub fn draw_to_hand<T>(
     // Then trigger an update of card origins for that hand
     commands.trigger(UpdateCardOrigins(trigger.hand_entity));
 }
+
+#[derive(Event)]
+pub struct UpdateCardOrigins(pub Entity);
 
 pub fn update_card_origins<T>(
     trigger: Trigger<UpdateCardOrigins>,
